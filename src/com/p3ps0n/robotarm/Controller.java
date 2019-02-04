@@ -4,6 +4,7 @@ package com.p3ps0n.robotarm;
         import javafx.application.Platform;
         import javafx.fxml.FXML;
         import javafx.scene.control.*;
+        import javafx.scene.input.KeyEvent;
         import javafx.scene.layout.*;
         import java.io.IOException;
 
@@ -32,58 +33,6 @@ public class Controller {
     @FXML
     private void initialize() {
         refreshDevices(); // Refresh device list when app starts
-
-        /* KeyEvents */
-        mainPane.setOnKeyPressed(event -> {
-            switch(event.getCode()) {
-                case Q:
-                    if(sliderBase.getValue() > 0)
-                        sliderBase.setValue(sliderBase.getValue()-1);
-                    break;
-
-                case W:
-                    if(sliderBase.getValue() < 180)
-                        sliderBase.setValue(sliderBase.getValue()+1);
-                    break;
-
-                case E:
-                    if(sliderArm.getValue() > 0)
-                        sliderArm.setValue(sliderArm.getValue()-1);
-                    break;
-
-                case R:
-                    if(sliderArm.getValue() < 180)
-                        sliderArm.setValue(sliderArm.getValue()+1);
-                    break;
-
-                case A:
-                    if(sliderForearm.getValue() > 0)
-                        sliderForearm.setValue(sliderForearm.getValue()-1);
-                    break;
-
-                case S:
-                    if(sliderForearm.getValue() < 180)
-                        sliderForearm.setValue(sliderForearm.getValue()+1);
-                    break;
-
-                case D:
-                    if(sliderGrappler.getValue() > 0)
-                        sliderGrappler.setValue(sliderGrappler.getValue()-1);
-                    break;
-
-                case F:
-                    if(sliderGrappler.getValue() < 180)
-                        sliderGrappler.setValue(sliderGrappler.getValue()+1);
-                    break;
-
-                case T:
-                    sliderBase.setValue(90);
-                    sliderArm.setValue(90);
-                    sliderForearm.setValue(90);
-                    sliderGrappler.setValue(90);
-                    break;
-            }
-        });
 
         sliderBase.valueProperty().addListener(event -> baseValue.textProperty().setValue(String.valueOf((int)sliderBase.getValue())));
         sliderArm.valueProperty().addListener(event -> armValue.textProperty().setValue(String.valueOf((int)sliderArm.getValue())));
@@ -154,6 +103,50 @@ public class Controller {
         }
     }
 
+    @FXML private void keyPressed(KeyEvent event) {
+        /* KeyEvents */
+        switch(event.getCode()) {
+            case Q:
+                if(sliderBase.getValue() > 0) sliderBase.setValue(sliderBase.getValue()-1);
+                break;
+
+            case W:
+                if(sliderBase.getValue() < 180) sliderBase.setValue(sliderBase.getValue()+1);
+                break;
+
+            case E:
+                if(sliderArm.getValue() > 0) sliderArm.setValue(sliderArm.getValue()-1);
+                break;
+
+            case R:
+                if(sliderArm.getValue() < 180) sliderArm.setValue(sliderArm.getValue()+1);
+                break;
+
+            case A:
+                if(sliderForearm.getValue() > 0) sliderForearm.setValue(sliderForearm.getValue()-1);
+                break;
+
+            case S:
+                if(sliderForearm.getValue() < 180) sliderForearm.setValue(sliderForearm.getValue()+1);
+                break;
+
+            case D:
+                if(sliderGrappler.getValue() > 0) sliderGrappler.setValue(sliderGrappler.getValue()-1);
+                break;
+
+            case F:
+                if(sliderGrappler.getValue() < 180) sliderGrappler.setValue(sliderGrappler.getValue()+1);
+                break;
+
+            case T:
+                sliderBase.setValue(90);
+                sliderArm.setValue(90);
+                sliderForearm.setValue(90);
+                sliderGrappler.setValue(90);
+                break;
+        }
+    }
+
     private void refreshDevices() {
         ports = SerialPort.getCommPorts();
         chooseDevice.getItems().clear();
@@ -166,7 +159,8 @@ public class Controller {
 
     private void connected() {
         /*  Change appearance of connection pane when connected  */
-        connectionLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
+        connectionLabel.getStyleClass().add("label-connected");
+        connectionLabel.getStyleClass().remove("label-disconnected");
         connectionLabel.setText("Connected with " + port.getSystemPortName());
         chooseDevice.setVisible(false);
         refreshBtn.setVisible(false);
@@ -185,7 +179,8 @@ public class Controller {
     private void disconnected() {
         /*  Change appearance of connection pane when not connected  */
         Platform.runLater(() -> {
-            connectionLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+            connectionLabel.getStyleClass().add("label-disconnected");
+            connectionLabel.getStyleClass().remove("label-connected");
             connectionLabel.setText("Connect with device");
             chooseDevice.setVisible(true);
             refreshBtn.setVisible(true);
