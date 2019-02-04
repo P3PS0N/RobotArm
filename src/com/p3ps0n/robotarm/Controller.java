@@ -27,11 +27,11 @@ public class Controller {
     @FXML Slider sliderGrappler;
 
     private SerialPort[] ports;
+    private SerialPort port;
 
     @FXML
     private void initialize() {
         refreshDevices(); // Refresh device list when app starts
-        refreshBtn.setOnMouseClicked(event -> refreshDevices()); // Refresh device list when refreshBtn pressed
 
         /* KeyEvents */
         mainPane.setOnKeyPressed(event -> {
@@ -91,90 +91,93 @@ public class Controller {
         sliderGrappler.valueProperty().addListener(event -> grapplerValue.textProperty().setValue(String.valueOf((int)sliderGrappler.getValue())));
 
 
-        connectBtn.setOnMouseClicked(event -> {
-            int deviceIndex = chooseDevice.getSelectionModel().getSelectedIndex();
-            SerialPort port = ports[deviceIndex];
+
+    }
+
+    @FXML private void refresh() {
+        refreshDevices();
+    }
+
+    @FXML private void connect() {
+        int deviceIndex = chooseDevice.getSelectionModel().getSelectedIndex();
+        port = ports[deviceIndex];
 
 
-            /* Try to open serial port*/
-            if(port.openPort()) {
-                // Successfully connected with selected port
-                port.setComPortParameters(115200, 8, 1, 0);
-                port.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
+        /* Try to open serial port*/
+        if(port.openPort()) {
+            // Successfully connected with selected port
+            port.setComPortParameters(115200, 8, 1, 0);
+            port.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
 
-                logLabel.setText("");
+            logLabel.setText("");
 
-                /*  Change appearance of connection pane when connected  */
-                connectionLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
-                connectionLabel.setText("Connected with " + port.getSystemPortName());
-                chooseDevice.setVisible(false);
-                refreshBtn.setVisible(false);
-                connectBtn.setVisible(false);
-                disconnectBtn.setVisible(true);
-                connectionPane.setMinHeight(100);
-                connectionPane.setPrefHeight(100);
-                controlPane.setVisible(true);
+            /*  Change appearance of connection pane when connected  */
+            connectionLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
+            connectionLabel.setText("Connected with " + port.getSystemPortName());
+            chooseDevice.setVisible(false);
+            refreshBtn.setVisible(false);
+            connectBtn.setVisible(false);
+            disconnectBtn.setVisible(true);
+            connectionPane.setMinHeight(100);
+            connectionPane.setPrefHeight(100);
+            controlPane.setVisible(true);
 
-                sliderBase.setValue(90);
-                sliderArm.setValue(90);
-                sliderForearm.setValue(90);
-                sliderGrappler.setValue(90);
+            sliderBase.setValue(90);
+            sliderArm.setValue(90);
+            sliderForearm.setValue(90);
+            sliderGrappler.setValue(90);
 
 
-                Runnable connection = () -> {
-                    while(port.isOpen()) {
-                        try {
-                            String data = (int)sliderBase.getValue() + ":" +
-                                          (int)sliderArm.getValue() + ":" +
-                                          (int)sliderForearm.getValue() + ":" +
-                                          (int)sliderGrappler.getValue() + "\n";
+            Runnable connection = () -> {
+                while(port.isOpen()) {
+                    try {
+                        String data = (int)sliderBase.getValue() + ":" +
+                                (int)sliderArm.getValue() + ":" +
+                                (int)sliderForearm.getValue() + ":" +
+                                (int)sliderGrappler.getValue() + "\n";
 
-                            for(int i = 0; i < data.toCharArray().length; i++) {
-                                port.getOutputStream().write(data.charAt(i));
-                                port.getOutputStream().flush();
-                            }
-
-                            Thread.sleep(25);
-                        } catch(IOException ex) {
-                            ex.printStackTrace();
-                        } catch (InterruptedException ex) {
-                            ex.printStackTrace();
+                        for(int i = 0; i < data.toCharArray().length; i++) {
+                            port.getOutputStream().write(data.charAt(i));
+                            port.getOutputStream().flush();
                         }
 
+                        Thread.sleep(25);
+                    } catch(IOException ex) {
+                        ex.printStackTrace();
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
                     }
 
-                    /*  Change appearance of connection pane when not connected  */
-                    Platform.runLater(() -> {
-                        connectionLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-                        connectionLabel.setText("Connect with device");
-                        chooseDevice.setVisible(true);
-                        refreshBtn.setVisible(true);
-                        connectBtn.setVisible(true);
-                        disconnectBtn.setVisible(false);
-                        connectionPane.setMinHeight(145);
-                        connectionPane.setPrefHeight(145);
-                        controlPane.setVisible(false);
-                    });
-                };
-                Thread connectionThread = new Thread(connection);
-                connectionThread.setDaemon(true);
-                connectionThread.start();
+                }
 
-            } else {
-                // Something went wrong, e.g. port is busy
-                logLabel.setText("Unable to open the port.");
-            }
+                /*  Change appearance of connection pane when not connected  */
+                Platform.runLater(() -> {
+                    connectionLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+                    connectionLabel.setText("Connect with device");
+                    chooseDevice.setVisible(true);
+                    refreshBtn.setVisible(true);
+                    connectBtn.setVisible(true);
+                    disconnectBtn.setVisible(false);
+                    connectionPane.setMinHeight(145);
+                    connectionPane.setPrefHeight(145);
+                    controlPane.setVisible(false);
+                });
+            };
+            Thread connectionThread = new Thread(connection);
+            connectionThread.setDaemon(true);
+            connectionThread.start();
 
-        });
+        } else {
+            // Something went wrong, e.g. port is busy
+            logLabel.setText("Unable to open the port.");
+        }
 
-        disconnectBtn.setOnMouseClicked(event -> {
-            int deviceIndex = chooseDevice.getSelectionModel().getSelectedIndex();
-            SerialPort port = ports[deviceIndex];
-            if(!port.closePort()) {
-                logLabel.setText("An error occurred while closing port.");
-            }
-        });
+    }
 
+    @FXML private void disconnect() {
+        if(!port.closePort()) {
+            logLabel.setText("An error occurred while closing port.");
+        }
     }
 
     private void refreshDevices() {
