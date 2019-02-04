@@ -25,6 +25,21 @@
 }
 /*------------------------------------------------*/
 
+/*  Label */
+.label {
+    -fx-font-weight: bold;
+}
+
+.label-connected {
+    -fx-font-size: 13px;
+}
+
+.label-disconnected {
+    -fx-font-size: 16px;
+
+}
+/*------------------------------------------------*/
+
 
 /*	ChoiceBox	*/
 .choice-box {
