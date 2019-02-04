@@ -1,0 +1,48 @@
+/*  Panes   */
+.info-pane {
+	-fx-border-width: 3 0 0 0;
+	-fx-border-color: #595959;
+}
+.primary-pane { -fx-background-color: #4B4B4B }
+.secondary-pane { -fx-background-color: #595959 }
+/*------------------------------------------------*/
+
+
+/*	Buttons	*/
+.refresh-btn {
+	-fx-graphic: url("../img/refresh.png");
+	-fx-background-color: transparent;
+	-fx-background-size: 1024px;
+	-fx-padding: 2, 2, 2, 2;
+}
+.connect-btn {
+	-fx-background-color: #4CAF50;
+	-fx-text-fill: white;
+}
+.disconnect-btn {
+	-fx-background-color: #f44336;
+	-fx-text-fill: white;
+}
+/*------------------------------------------------*/
+
+
+/*	ChoiceBox	*/
+.choice-box {
+	-fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-background-color: #555555;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+}
+.choice-box .label {
+	-fx-text-fill: white;
+}
+.choice-box .context-menu {
+	-fx-background-color: #555555;
+}
+/*------------------------------------------------*/
+
+
+.slider .track {
+    -fx-background-color: #4CAF50;
+}
