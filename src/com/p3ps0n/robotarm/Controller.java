@@ -1,11 +1,11 @@
 package com.p3ps0n.robotarm;
 
-import com.fazecast.jSerialComm.SerialPort;
-import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import java.io.IOException;
+        import com.fazecast.jSerialComm.SerialPort;
+        import javafx.application.Platform;
+        import javafx.fxml.FXML;
+        import javafx.scene.control.*;
+        import javafx.scene.layout.*;
+        import java.io.IOException;
 
 public class Controller {
     @FXML AnchorPane mainPane;
@@ -111,22 +111,7 @@ public class Controller {
 
             logLabel.setText("");
 
-            /*  Change appearance of connection pane when connected  */
-            connectionLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
-            connectionLabel.setText("Connected with " + port.getSystemPortName());
-            chooseDevice.setVisible(false);
-            refreshBtn.setVisible(false);
-            connectBtn.setVisible(false);
-            disconnectBtn.setVisible(true);
-            connectionPane.setMinHeight(100);
-            connectionPane.setPrefHeight(100);
-            controlPane.setVisible(true);
-
-            sliderBase.setValue(90);
-            sliderArm.setValue(90);
-            sliderForearm.setValue(90);
-            sliderGrappler.setValue(90);
-
+            connected();
 
             Runnable connection = () -> {
                 while(port.isOpen()) {
@@ -150,18 +135,7 @@ public class Controller {
 
                 }
 
-                /*  Change appearance of connection pane when not connected  */
-                Platform.runLater(() -> {
-                    connectionLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-                    connectionLabel.setText("Connect with device");
-                    chooseDevice.setVisible(true);
-                    refreshBtn.setVisible(true);
-                    connectBtn.setVisible(true);
-                    disconnectBtn.setVisible(false);
-                    connectionPane.setMinHeight(145);
-                    connectionPane.setPrefHeight(145);
-                    controlPane.setVisible(false);
-                });
+               disconnected();
             };
             Thread connectionThread = new Thread(connection);
             connectionThread.setDaemon(true);
@@ -188,5 +162,38 @@ public class Controller {
 
         if(!chooseDevice.getItems().isEmpty())
             chooseDevice.setValue(chooseDevice.getItems().get(0));
+    }
+
+    private void connected() {
+        /*  Change appearance of connection pane when connected  */
+        connectionLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
+        connectionLabel.setText("Connected with " + port.getSystemPortName());
+        chooseDevice.setVisible(false);
+        refreshBtn.setVisible(false);
+        connectBtn.setVisible(false);
+        disconnectBtn.setVisible(true);
+        connectionPane.setMinHeight(100);
+        connectionPane.setPrefHeight(100);
+        controlPane.setVisible(true);
+
+        sliderBase.setValue(90);
+        sliderArm.setValue(90);
+        sliderForearm.setValue(90);
+        sliderGrappler.setValue(90);
+    }
+
+    private void disconnected() {
+        /*  Change appearance of connection pane when not connected  */
+        Platform.runLater(() -> {
+            connectionLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+            connectionLabel.setText("Connect with device");
+            chooseDevice.setVisible(true);
+            refreshBtn.setVisible(true);
+            connectBtn.setVisible(true);
+            disconnectBtn.setVisible(false);
+            connectionPane.setMinHeight(145);
+            connectionPane.setPrefHeight(145);
+            controlPane.setVisible(false);
+        });
     }
 }
